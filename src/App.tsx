@@ -9,7 +9,7 @@ function App() {
   return (
     <Provider store={store}>
       <PrimeReactProvider>
-        <Column style={{height:"100vh", width: "100vw"}} alignment={Alignment.center} crossAlignment={Alignment.center}>
+        <Column alignment={Alignment.center} crossAlignment={Alignment.center}>
           <CoumPlayer height={100} width={400}/>
         </Column>
         </PrimeReactProvider>
