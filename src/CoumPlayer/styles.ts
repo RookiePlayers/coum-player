@@ -18,5 +18,9 @@ export  const styles: {
         borderRadius: 8,
         objectFit: "cover",
         border: `1px solid ${colors.border}`
+    },
+    icon: {
+        color: colors.textPrimary,
+        fontSize: 50
     }
 } 

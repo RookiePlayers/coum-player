@@ -1,12 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Alignment, Column, Row } from "ruki-react-layouts"
+import { Alignment, Column, Row, Stack } from "ruki-react-layouts"
 import { styles } from "./styles";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Song } from "../types";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useSongMockService, useSongService } from "../services/useSongService";
-import { Skeleton, Typography } from "@mui/material";
+import { IconButton, Skeleton, Typography } from "@mui/material";
+import { Slider } from "primereact/slider";
+import ReactHowler from 'react-howler';
+import { useMusicPlayer } from "../provider/music_player_provider";
+import { Pause, PlayArrow, PlayArrowRounded } from "@mui/icons-material";
+import {motion} from 'framer-motion';
+
 interface CoumPlayerProp {
     height: number | string;
     width: number | string;
@@ -20,9 +26,14 @@ export const CoumPlayer  = ({
     const [currentSong, setCurrentSong] = useState<Song | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(false);
     const songQueue = useSelector((state: RootState) => state.playerQueue.queue);
+    const {isPlaying, playerRef, togglePlay} = useMusicPlayer()
     //const {getSong} = useSongService();
     const {getMockSong} = useSongMockService();
     
+    const handleTogglePlay = ()=>{
+        if(currentSong)
+            togglePlay(currentSong);
+    }
     const retrieveSong = async (songId: string) => {
         setLoading(true);
         const song = await getMockSong(songId);
@@ -50,7 +61,19 @@ export const CoumPlayer  = ({
                     loading ? <Skeleton variant="text" /> :
                     <Typography variant="body2" style={{color: "white"}}>{currentSong?.songPerformer}</Typography>
                 }
+                <ReactHowler ref={playerRef} src={[currentSong?.url ?? '']} />
             </Column>
+        </Row>
+        <Row style={{position: "relative", width: "30%", height: "100%"}} alignment={Alignment.right} crossAlignment={Alignment.center}>
+            <Stack>
+                <Row alignment={Alignment.center} crossAlignment={Alignment.center} style={{height:"100%"}}>
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                    <IconButton onClick={handleTogglePlay}>
+                        {isPlaying ? <Pause style={styles.icon} /> : <PlayArrowRounded style={styles.icon} />}
+                    </IconButton>
+                </motion.div>
+                </Row>
+            </Stack>
         </Row>
     </Row>
 }
