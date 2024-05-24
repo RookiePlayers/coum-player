@@ -12,6 +12,8 @@ import ReactHowler from 'react-howler';
 import { useMusicPlayer } from "../provider/music_player_provider";
 import { Pause, PlayArrow, PlayArrowRounded } from "@mui/icons-material";
 import {motion} from 'framer-motion';
+import { PlayerApp } from "./PlayerApp";
+import { PlayerWidget } from "./PlayerWidget";
 
 interface CoumPlayerProp {
     height: number | string;
@@ -23,57 +25,27 @@ export const CoumPlayer  = ({
     width,
     albumSize
 }: CoumPlayerProp) => {
-    const [currentSong, setCurrentSong] = useState<Song | undefined>(undefined);
-    const [loading, setLoading] = useState<boolean>(false);
-    const songQueue = useSelector((state: RootState) => state.playerQueue.queue);
-    const {isPlaying, playerRef, togglePlay} = useMusicPlayer()
-    //const {getSong} = useSongService();
-    const {getMockSong} = useSongMockService();
-    
-    const handleTogglePlay = ()=>{
-        if(currentSong)
-            togglePlay(currentSong);
-    }
-    const retrieveSong = async (songId: string) => {
-        setLoading(true);
-        const song = await getMockSong(songId);
-        if (song?.data) {
-            setCurrentSong(song.data);
-        }
-        setLoading(false);
-    }
+    const [isExpanded, setIsExpanded] = useState(false);
+    const expand = () => setIsExpanded(!isExpanded);
     useEffect(() => {
-        void retrieveSong(songQueue?.currentSong ?? "");
-    },[songQueue?.currentSong])
-
+        const handleParentMessage = (event: any) => {
+          if (event.source !== window.parent) return; // Security check
+    
+          const { data } = event;
+          if (data === 'expand' || data === 'collapse') {
+            setIsExpanded(data === 'expand');
+          }
+        };
+    
+        window.addEventListener('message', handleParentMessage);
+    
+        return () => window.removeEventListener('message', handleParentMessage);
+      }, []);
     return <Row alignment={Alignment.spaceBetween} crossAlignment={Alignment.center} style={{...styles.card ,width: width ?? "100%", height: height ?? "100%",padding: 5}}>
-        <Row alignment={Alignment.left} crossAlignment={Alignment.center} >
-            {
-                loading ? <Skeleton variant="rectangular" sx={{ width: albumSize ?? 80, height: albumSize ?? 80, bgcolor: 'grey.500' }} /> :
-                <img src={currentSong?.url} alt={currentSong?.url} style={{...styles.album, width: albumSize ?? 80, height: albumSize ?? 80}}/> 
-            }
-            <Column style={{margin: "0 10px"}}>
-                {
-                    loading ? <Skeleton variant="text" /> :
-                    <Typography variant="h6" style={{color: "white"}}>{currentSong?.songName}</Typography>
-                }
-                {
-                    loading ? <Skeleton variant="text" /> :
-                    <Typography variant="body2" style={{color: "white"}}>{currentSong?.songPerformer}</Typography>
-                }
-                <ReactHowler ref={playerRef} src={[currentSong?.url ?? '']} />
-            </Column>
-        </Row>
-        <Row style={{position: "relative", width: "30%", height: "100%"}} alignment={Alignment.right} crossAlignment={Alignment.center}>
-            <Stack>
-                <Row alignment={Alignment.center} crossAlignment={Alignment.center} style={{height:"100%"}}>
-                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                    <IconButton onClick={handleTogglePlay}>
-                        {isPlaying ? <Pause style={styles.icon} /> : <PlayArrowRounded style={styles.icon} />}
-                    </IconButton>
-                </motion.div>
-                </Row>
-            </Stack>
-        </Row>
+        {
+            isExpanded ? <PlayerApp onExit={
+              expand
+            } /> : <PlayerWidget onExpand = {expand} height={height} width={width} albumSize={albumSize} />
+        }
     </Row>
 }

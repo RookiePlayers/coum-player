@@ -15,4 +15,5 @@ export const axiosGET = async (request: AxiosRequestConfig) => {
 }
 export const RouteNames = {
     song: "song",
+    user: "user"
 }

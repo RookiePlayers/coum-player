@@ -1,3 +1,19 @@
+
+type User = {
+    uid?: string;
+    customerId?: string;
+    email?: string;
+    username?: string;
+    location?: string;
+    rating?: number;
+    faceLink?: string;
+    instaLink?: string;
+    spotLink?: string;
+    twitLink?: string;
+    subscriptionId?: string;
+    subscriptionProgram?: string;
+    imageUrl?: string;
+}
 type Song = {
     audioDuration: number;
     compositionSplitBreakdown: string;
@@ -43,4 +59,4 @@ type PlayerQueue = {
     currentSongIndex: number;
 }
 
-export type { Song, Playlist, PlayerQueue }
+export type { Song, Playlist, PlayerQueue, User}

@@ -5,6 +5,7 @@ import { Alignment, Column } from 'ruki-react-layouts';
 import { CoumPlayer } from './CoumPlayer';
 import { PrimeReactProvider } from 'primereact/api';
 import { InitialMusicPlayerContextState, MusicPlayerContext } from './provider/music_player_provider';
+import { AuthProvider } from './provider/auth_provider';
 
 export const parseUrlForQueryParams = (url: string)=>{
   const urlSplit = url.split('/');
@@ -28,11 +29,13 @@ function App() {
   return (
     <Provider store={store}>
       <PrimeReactProvider>
-        <MusicPlayerContext.Provider value={InitialMusicPlayerContextState}>
-        <Column alignment={Alignment.center} crossAlignment={Alignment.center}>
-          <CoumPlayer height={height} width={width}/>
-        </Column>
-        </MusicPlayerContext.Provider>
+        <AuthProvider>
+          <MusicPlayerContext.Provider value={InitialMusicPlayerContextState}>
+          <Column alignment={Alignment.center} crossAlignment={Alignment.center}>
+            <CoumPlayer height={height} width={width}/>
+          </Column>
+          </MusicPlayerContext.Provider>
+        </AuthProvider>
         </PrimeReactProvider>
       </Provider>
   );

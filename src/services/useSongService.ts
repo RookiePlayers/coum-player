@@ -3,7 +3,7 @@ import { BASE_URL, RouteNames, axiosGET } from "./misc";
 import MockAdapter from "axios-mock-adapter";
 import { Song } from "../types";
 export const useSongService = () => {
-    const getSong = async (songId: string) => {
+    const getSong = async (songId: string):Promise<Song> => {
         const request = {
             url: `${BASE_URL}/${RouteNames.song}`,
             method: "GET",
@@ -14,7 +14,12 @@ export const useSongService = () => {
                 id: songId
             }
         }
-        return await axiosGET(request);
+        const data =  await axiosGET(request);
+        if(data?.status !== 200)
+            throw new Error("Failed to get song");
+        if(data?.data === null)
+            throw new Error("Song not found");
+        return data?.data as Song;
         
     }
 
