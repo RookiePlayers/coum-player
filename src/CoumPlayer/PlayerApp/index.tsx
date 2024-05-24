@@ -7,11 +7,12 @@ import { User } from "../../types"
 import { useSelector } from "react-redux"
 import { RootState } from "../../store/store"
 import { ProfileAvatar } from "./Components/profile_avatar"
-import { CoumDrawer, CoumDrawerTab, kDrawerWidth } from "./Components/drawer"
+import { CoumDrawer, CoumDrawerMobile, CoumDrawerTab, kDrawerWidth } from "./Components/drawer"
 import { useEffect, useState } from "react"
 import { QueuePage } from "./pages/QueuePage"
 import { LibraryPage } from "./pages/LibraryPage"
 import { SettingsPage } from "./pages/SettingPage"
+import { useMediaQuery } from "../../provider/media_query"
 
 const CoumTabs: CoumDrawerTab[] = [
     {
@@ -38,6 +39,7 @@ export const PlayerApp = ({onExit}: {onExit: ()=>void}) => {
     const currentUser = useSelector((state: RootState) => state.auth.user);
     const [openDrawer, setOpenDrawer] = useState<boolean>(true);
     const [pageInView, setPageInView] = useState<React.ReactNode>(CoumTabs[0].content);
+    
     const handlePageSelected = (index: number) => {
         console.log("Page selected: ", index);
         setPageInView(CoumTabs[index].content);
@@ -66,7 +68,7 @@ const BuildHeader = ({user, onOpenMenu, open, onExit}: {user?: User; onOpenMenu:
     useEffect(()=>{
         setOpenDrawer(open);
     },[open])
-    return <Row style={{padding: 20,width:"100%"}} alignment={Alignment.spaceBetween} crossAlignment={Alignment.center}>
+    return <Row style={{paddingBottom: 20,width:"100%"}} alignment={Alignment.spaceBetween} crossAlignment={Alignment.center}>
       <Row crossAlignment={Alignment.center} alignment={Alignment.left}>
                 <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                     <IconButton onClick={onOpenMenu}>

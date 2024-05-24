@@ -10,20 +10,27 @@ import { IconButton, Skeleton, Typography } from "@mui/material";
 import { Slider } from "primereact/slider";
 import ReactHowler from 'react-howler';
 import { useMusicPlayer } from "../../provider/music_player_provider";
-import { Pause, PlayArrow, PlayArrowRounded, QueueMusic, QueueMusicRounded } from "@mui/icons-material";
+import { Pause, PlayArrow, PlayArrowRounded, QueueMusic, QueueMusicRounded, SkipNextRounded, SkipPreviousRounded } from "@mui/icons-material";
 import {motion} from 'framer-motion';
+import { colors } from "../../colors";
 
 interface PlayerWidgetProp {
     height: number | string;
     width: number | string;
     albumSize?: number | string;
     onExpand?: () => void;
+    expandable?: boolean;
+    variant?: "large" | "default";
+    backgroundColor?: string;
  }
 export const PlayerWidget  = ({
     height,
     width,
     albumSize,
-    onExpand
+    onExpand,
+    expandable,
+    variant,
+    backgroundColor
 }: PlayerWidgetProp) => {
     const [currentSong, setCurrentSong] = useState<Song | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(false);
@@ -44,43 +51,137 @@ export const PlayerWidget  = ({
         }
         setLoading(false);
     }
+
     useEffect(() => {
         void retrieveSong(songQueue?.currentSong ?? "");
     },[songQueue?.currentSong])
 
-    return <Row alignment={Alignment.spaceBetween} crossAlignment={Alignment.center} style={{...styles.card ,width: width ?? "100%", height: height ?? "100%",padding: 5}}>
+    if(variant === "large")
+        return <LargePlayer height={height} width={width} albumSize={albumSize} onExpand={onExpand} expandable={expandable} variant={variant}/>
+
+    return <Row alignment={Alignment.spaceBetween} crossAlignment={Alignment.center} style={{...styles.card ,backgroundColor: backgroundColor ?? colors.background, width: width ?? "100%",padding: 10}}>
         <Row alignment={Alignment.left} crossAlignment={Alignment.center} >
             {
-                loading ? <Skeleton variant="rectangular" sx={{ width: albumSize ?? 80, height: albumSize ?? 80, bgcolor: 'grey.500' }} /> :
-                <img src={currentSong?.url} alt={currentSong?.url} style={{...styles.album, width: albumSize ?? 80, height: albumSize ?? 80}}/> 
+                loading ? <Skeleton variant="rectangular" sx={{ width: albumSize ?? 50, height: albumSize ?? 50, bgcolor: 'grey.500' }} /> :
+                <img src={currentSong?.url} alt={currentSong?.url} style={{...styles.album, width: albumSize ?? 50, height: albumSize ?? 50}}/> 
             }
-            <Column style={{margin: "0 10px"}}>
-                {
-                    loading ? <Skeleton variant="text" /> :
-                    <Typography variant="h6" style={{color: "white"}}>{currentSong?.songName}</Typography>
-                }
-                {
-                    loading ? <Skeleton variant="text" /> :
-                    <Typography variant="body2" style={{color: "white"}}>{currentSong?.songPerformer}</Typography>
-                }
+             <Column alignment={Alignment.center} style={{marginLeft:10}}>
+                {loading ? <Skeleton variant="text" /> :<Typography style={{
+                    fontSize: 15,
+                    color: colors.textPrimary,
+                    fontWeight: "bold"
+                }}>{
+                    currentSong?.songName ?? "--"
+                }</Typography>}
+                
+               {loading ? <Skeleton variant="text" /> :<Typography style={{
+                    fontSize: 12,
+                    color: colors.textSecondary,
+                }}>{
+                    currentSong?.songPerformer ?? "--"
+                }</Typography>}
+
                 <ReactHowler ref={playerRef} src={[currentSong?.url ?? '']} />
             </Column>
         </Row>
         <Row style={{position: "relative", width: "30%", height: "100%"}} alignment={Alignment.right} crossAlignment={Alignment.center}>
             <Stack>
-                <Row alignment={Alignment.center} crossAlignment={Alignment.center} style={{height:"100%"}}>
+                <Row alignment={Alignment.right} crossAlignment={Alignment.center} style={{height:"100%"}}>
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                    <IconButton onClick={handleTogglePlay}>
+                        {isPlaying ? <Pause style={styles.icon} /> : <PlayArrowRounded style={styles.icon} />}
+                    </IconButton>
+                </motion.div>
+                {expandable && <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                    <IconButton onClick={onExpand}>
+                        <QueueMusicRounded style={styles.icon} />
+                    </IconButton>
+                </motion.div>}
+                </Row>
+            </Stack>
+        </Row>
+    </Row>
+}
+
+export const LargePlayer = ({
+    height,
+    width,
+    albumSize,
+    onExpand,
+    expandable,
+    variant,
+    backgroundColor
+}: PlayerWidgetProp) => {
+    const [currentSong, setCurrentSong] = useState<Song | undefined>(undefined);
+    const [loading, setLoading] = useState<boolean>(false);
+    const songQueue = useSelector((state: RootState) => state.playerQueue.queue);
+    const {isPlaying, playerRef, togglePlay} = useMusicPlayer()
+    //const {getSong} = useSongService();
+    const {getMockSong} = useSongMockService();
+    
+    const handleTogglePlay = ()=>{
+        if(currentSong)
+            togglePlay(currentSong);
+    }
+    const retrieveSong = async (songId: string) => {
+        setLoading(true);
+        const song = await getMockSong(songId);
+        if (song) {
+            setCurrentSong(song);
+        }
+        setLoading(false);
+    }
+
+    useEffect(() => {
+        void retrieveSong(songQueue?.currentSong ?? "");
+    },[songQueue?.currentSong])
+
+    return <Row style={{width: "100%",padding: 10,}}>
+        <Row style={{
+            backgroundColor: colors.playerColor,
+            borderRadius: 10,
+            padding: "5px 10px",
+            width: "100%",
+        }} alignment={Alignment.spaceBetween} crossAlignment={Alignment.center}>
+        <Row crossAlignment={Alignment.center} style={{width:"24%"}}>
+            <img src="https://picsum.photos/200/200" alt="album" style={{
+                ...styles.album,width: albumSize ?? 60, height: albumSize ?? 60
+            }}/>
+            <Column alignment={Alignment.center} style={{marginLeft:10}}>
+                <Typography style={{
+                    fontSize: 15,
+                    color: colors.textPrimary,
+                    fontWeight: "bold"
+                }}>{
+                    currentSong?.songName ?? "--"
+                }</Typography><Typography style={{
+                    fontSize: 12,
+                    color: colors.textSecondary,
+                }}>{
+                    currentSong?.songPerformer ?? "--"
+                }</Typography>
+            </Column>
+        </Row>
+        <Column style={{width: "50%"}} alignment={Alignment.center} crossAlignment={Alignment.center}>
+            <Row alignment={Alignment.center} crossAlignment={Alignment.center}>
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}><IconButton>
+                    <SkipPreviousRounded style={{...styles.icon, fontSize: 30}}/>
+                </IconButton>
+                </motion.div>
                 <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                     <IconButton onClick={handleTogglePlay}>
                         {isPlaying ? <Pause style={styles.icon} /> : <PlayArrowRounded style={styles.icon} />}
                     </IconButton>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                    <IconButton onClick={onExpand}>
-                        <QueueMusicRounded style={styles.icon} />
-                    </IconButton>
-                </motion.div>
-                </Row>
-            </Stack>
+                <IconButton>
+                    <SkipNextRounded style={{...styles.icon, fontSize: 30}}/>
+                </IconButton></motion.div>
+            </Row>
+            <Slider value={50} onChange={()=>{}} style={{width: "80%"}}/>
+        </Column>
+        <Column style={{width: "24%"}} alignment={Alignment.center} crossAlignment={Alignment.center}>
+        </Column>
         </Row>
     </Row>
 }

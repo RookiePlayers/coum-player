@@ -5,5 +5,6 @@ export const colors = {
     secondary: '#FFA987',
     textPrimary: '#FFFFFF',
     textSecondary: '#B8B8B8',
-    border: '#ffffff1f'
+    border: '#ffffff1f',
+    playerColor: "#3432324a"
 }

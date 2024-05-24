@@ -1,8 +1,11 @@
-import { Box, Divider, Drawer as MuiDrawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, CssBaseline, useTheme, IconButton } from "@mui/material";
+import { Box, Divider, Drawer as MuiDrawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, styled, CssBaseline, useTheme, IconButton, Typography } from "@mui/material";
 import { colors } from "../../../colors";
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
-import { Row } from "ruki-react-layouts";
+import { Alignment, Column, Row } from "ruki-react-layouts";
+import { useMediaQuery } from "../../../provider/media_query";
+import { CoumPlayer } from "../..";
+import { PlayerWidget } from "../../PlayerWidget";
 
 export type CoumDrawerTab = {
     name: string;
@@ -23,7 +26,7 @@ export const kDrawerWidth = 240;
 const Drawer = styled(MuiDrawer)(({ theme, open }) => ({
     position: "relative", //imp
     width: kDrawerWidth, //drawer width
-    height: "90%",
+    height: "80%",
     "& .MuiDrawer-paper": {
       width: kDrawerWidth, //drawer width
       position: "absolute", //imp
@@ -69,9 +72,11 @@ export const CoumDrawer = ({
     style
 }: CoumDrawerProps) => {
     const [currentPage, setCurrentPage] = useState<number>(0);
-  
+    const {isSmallDevice} = useMediaQuery();
+    if(isSmallDevice)
+        return <CoumDrawerMobile tabs={tabs} open={open} setOpen={setOpen} onPageSelected={onPageSelected} children={children} style={style}/>
     return (
-      <Row style={style}>
+      <Row style={{...style, position: "relative"}}>
         <CssBaseline />
         <Drawer
           sx={{
@@ -114,24 +119,61 @@ export const CoumDrawer = ({
         }
         </List>
         </Drawer>
-        <Main open={open}>
+        <Main open={open} >
             {children}
         </Main>
+        <Column style={{position: "absolute",width:"100%", bottom: 0, zIndex: 1200}}>
+            <PlayerWidget variant="large" height={100} width={"100%"}/>
+        </Column>
       </Row>
     );
   }
 
-{/* <List>
-{
-    tabs.map((tab, index) => {
-        return <ListItem key = {index} disablePadding>
-            <ListItemButton>
-                <ListItemIcon>
-                    {tab.icon}
-                </ListItemIcon>
-                <ListItemText primary={tab.name}/>
-            </ListItemButton>
-        </ListItem>
-    })
-}
-</List> */}
+  export const CoumDrawerMobile = ({
+    tabs,
+    open,
+    setOpen,
+    onPageSelected,
+    children,
+    style
+  }: CoumDrawerProps) => {
+    const theme = useTheme();
+    const [currentPage, setCurrentPage] = useState<number>(0);
+    const handleDrawerClose = () => {
+      setOpen(false);
+    }
+    return (
+      <Row style={{...style, position: 'relative', }}>
+        <CssBaseline />
+        <Main open={open}>
+            {children}
+        </Main>
+        <Column style={{position: "absolute", bottom: 0, padding: 10,width:"100%"}}>
+            <PlayerWidget height={100} width={"100%"} backgroundColor = {colors.playerColor}/>
+            <div style={{
+                marginBottom: 10
+            }}/>
+        <Row alignment={Alignment.spaceAround} style={{
+            borderTop: `1px solid ${colors.border}`,
+            width: "100%",
+            backgroundColor: colors.card, borderRadius: 20, padding: 10, zIndex: 100}}>
+                {
+                    tabs.map((tab, index) => {
+                        return <IconButton style={{
+                            opacity: index === currentPage ? 1 : 0.5
+                        }} key={index} onClick={()=>{
+                        setCurrentPage(index);
+                        onPageSelected(index);
+                        }}>
+                        <Column alignment={Alignment.center} crossAlignment={Alignment.center}>
+                            {tab.icon}
+                            <Typography variant="caption" style={{color: colors.textPrimary}}>{tab.name}</Typography>
+                            </Column>
+                        </IconButton>
+                    })
+                }
+                </Row>
+        </Column>
+      </Row>
+    );
+  }

@@ -19,7 +19,7 @@ export  const styles: {
     modalContent: {
         backgroundColor: colors.background,
         border: `1px solid ${colors.border}`,
-        boxShadow: `0 0 10px ${colors.border}`,
+        //boxShadow: `0 0 10px ${colors.border}`,
         position: "relative",
         borderRadius: 10,
         width: "90%",

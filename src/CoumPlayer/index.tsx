@@ -20,13 +20,28 @@ interface CoumPlayerProp {
     width: number | string;
     albumSize?: number | string;
  }
+ const sendMessageToParent = (width: number, height:number, isFullScreen:boolean) => {
+  window.parent.postMessage(
+    {
+      type: 'resizeIframe',
+      width,
+      height,
+      isFullScreen
+    },
+    '*'
+  );
+};
+
 export const CoumPlayer  = ({
     height,
     width,
     albumSize
 }: CoumPlayerProp) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const expand = () => setIsExpanded(!isExpanded);
+    const expand = () => {
+      setIsExpanded(!isExpanded);
+      sendMessageToParent(isExpanded ? 400 : 800, isExpanded ? 100 : 200, !isExpanded);
+    }
     useEffect(() => {
         const handleParentMessage = (event: any) => {
           if (event.source !== window.parent) return; // Security check
@@ -41,11 +56,13 @@ export const CoumPlayer  = ({
     
         return () => window.removeEventListener('message', handleParentMessage);
       }, []);
-    return <Row alignment={Alignment.spaceBetween} crossAlignment={Alignment.center} style={{...styles.card ,width: width ?? "100%", height: height ?? "100%",padding: 5}}>
+    return <Row alignment={Alignment.spaceBetween} crossAlignment={Alignment.center} style={{
+      marginLeft: 10
+    }}>
         {
             isExpanded ? <PlayerApp onExit={
               expand
-            } /> : <PlayerWidget onExpand = {expand} height={height} width={width} albumSize={albumSize} />
+            } /> : <PlayerWidget expandable onExpand = {expand} height={height} width={width} albumSize={albumSize} />
         }
     </Row>
 }

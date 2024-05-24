@@ -6,6 +6,7 @@ import { CoumPlayer } from './CoumPlayer';
 import { PrimeReactProvider } from 'primereact/api';
 import { InitialMusicPlayerContextState, MusicPlayerContext } from './provider/music_player_provider';
 import { AuthProvider } from './provider/auth_provider';
+import MediaQueryProvider from './provider/media_query';
 
 export const parseUrlForQueryParams = (url: string)=>{
   const urlSplit = url.split('/');
@@ -30,11 +31,11 @@ function App() {
     <Provider store={store}>
       <PrimeReactProvider>
         <AuthProvider>
+          <MediaQueryProvider>
           <MusicPlayerContext.Provider value={InitialMusicPlayerContextState}>
-          <Column alignment={Alignment.center} crossAlignment={Alignment.center}>
             <CoumPlayer height={height} width={width}/>
-          </Column>
           </MusicPlayerContext.Provider>
+          </MediaQueryProvider>
         </AuthProvider>
         </PrimeReactProvider>
       </Provider>
