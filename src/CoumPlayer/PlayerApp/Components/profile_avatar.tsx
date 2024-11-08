@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { User } from "../../../types";
 import { Avatar } from "@mui/material";
-import { useProfileMockService } from "../../../services/useProfileService";
+import { useProfileService } from "../../../services/useProfileService";
 
 export const ProfileAvatar = ({uid, profile: Profile, radius}: {uid?: string; profile?: User; radius?: number}) => {
     const [profile, setProfile] = useState<User | undefined | null>(null);
-    const {getMockProfile} = useProfileMockService();
+    const {getProfile} = useProfileService();
     const retrieveProfile = async (uid: string) => {
-        const profile = await getMockProfile(uid);
+        const profile = await getProfile(uid);
         if (profile) {
             setProfile(profile);
         }

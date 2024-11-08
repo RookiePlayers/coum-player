@@ -3,7 +3,7 @@ import React, { createContext, useEffect } from "react";
 import { FirebaseAuth } from "../config/firebase_config";
 import { useDispatch } from "react-redux";
 import { setCurrentUser } from "../slices/authSlice";
-import { useProfileMockService } from "../services/useProfileService";
+import { useProfileService } from "../services/useProfileService";
 
 type AuthContextType = {
     login: () => void;
@@ -19,7 +19,7 @@ export const useAuth = () => {
 }
 export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     const dispatch = useDispatch();
-    const {getMockProfile} = useProfileMockService();
+    const {getProfile} = useProfileService();
     const login = () => {
         console.log('login');
     }
@@ -30,7 +30,7 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
         const unsubscribe = FirebaseAuth.onAuthStateChanged((user) => {
             console.log('onAuthStateChanged', user);
             if(user){
-                getMockProfile(user.uid).then((profile) => {
+                getProfile(user.uid).then((profile) => {
                     dispatch(setCurrentUser(profile));
                 });
             }

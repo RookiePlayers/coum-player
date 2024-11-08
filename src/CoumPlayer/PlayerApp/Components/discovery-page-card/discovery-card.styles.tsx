@@ -1,5 +1,6 @@
-import { CSSProperties } from "react";
-import { colors } from "../../colors";
+
+    import { CSSProperties } from "react";
+import { colors } from "../../../../colors";
 
 export  const styles: {
     [key: string]: CSSProperties;
@@ -21,7 +22,6 @@ export  const styles: {
         border: `1px solid ${colors.border}`,
         //boxShadow: `0 0 10px ${colors.border}`,
         position: "relative",
-        overflowY: "hidden",
         borderRadius: 10,
         width: "90%",
         height: "90%"
@@ -51,5 +51,6 @@ export  const styles: {
     card: {
         backgroundColor: colors.card,
         border: `1px solid #ffffff1f`,
+        borderRadius: 16,
     }
 }

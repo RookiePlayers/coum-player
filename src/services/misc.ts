@@ -10,10 +10,12 @@ export const axiosGET = async (request: AxiosRequestConfig) => {
             status: data.status
         }
     }catch (e) {
-        console.error(e);
+        console.log(e);
     }
 }
 export const RouteNames = {
     song: "song",
-    user: "user"
+    songs: "song/list",
+    user: "user",
+    recentlyPlayed: "user/recentlyPlayed"
 }

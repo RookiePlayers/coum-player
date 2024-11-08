@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Song } from "../../types";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { useSongMockService, useSongService } from "../../services/useSongService";
+import { useSongService } from "../../services/useSongService";
 import { IconButton, Skeleton, Typography } from "@mui/material";
 import { Slider } from "primereact/slider";
 import ReactHowler from 'react-howler';
@@ -13,6 +13,7 @@ import { useMusicPlayer } from "../../provider/music_player_provider";
 import { Pause, PlayArrow, PlayArrowRounded, QueueMusic, QueueMusicRounded, SkipNextRounded, SkipPreviousRounded } from "@mui/icons-material";
 import {motion} from 'framer-motion';
 import { colors } from "../../colors";
+import { DEFAULT_ARTWORX } from "../../utils";
 
 interface PlayerWidgetProp {
     height: number | string;
@@ -37,7 +38,7 @@ export const PlayerWidget  = ({
     const songQueue = useSelector((state: RootState) => state.playerQueue.queue);
     const {isPlaying, playerRef, togglePlay} = useMusicPlayer()
     //const {getSong} = useSongService();
-    const {getMockSong} = useSongMockService();
+    const {getSong} = useSongService();
     
     const handleTogglePlay = ()=>{
         if(currentSong)
@@ -45,7 +46,7 @@ export const PlayerWidget  = ({
     }
     const retrieveSong = async (songId: string) => {
         setLoading(true);
-        const song = await getMockSong(songId);
+        const song = await getSong(songId);
         if (song) {
             setCurrentSong(song);
         }
@@ -81,7 +82,7 @@ export const PlayerWidget  = ({
                     currentSong?.songPerformer ?? "--"
                 }</Typography>}
 
-                <ReactHowler ref={playerRef} src={[currentSong?.url ?? '']} />
+                {/* <ReactHowler ref={playerRef} src={[currentSong?.url ?? '']} playing={isPlaying}/> */}
             </Column>
         </Row>
         <Row style={{position: "relative", width: "30%", height: "100%"}} alignment={Alignment.right} crossAlignment={Alignment.center}>
@@ -112,39 +113,33 @@ export const LargePlayer = ({
     variant,
     backgroundColor
 }: PlayerWidgetProp) => {
-    const [currentSong, setCurrentSong] = useState<Song | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(false);
     const songQueue = useSelector((state: RootState) => state.playerQueue.queue);
-    const {isPlaying, playerRef, togglePlay} = useMusicPlayer()
-    //const {getSong} = useSongService();
-    const {getMockSong} = useSongMockService();
+    const {isPlaying, playerRef, togglePlay, currentSong} = useMusicPlayer()
+    const {getSong} = useSongService();
+    const [song, setSong] = useState<Song | null>(null);
+
+        console.log('currentSong', currentSong);
+    useEffect(() => {
+        setSong(currentSong);
+    },[currentSong?.songId])
     
     const handleTogglePlay = ()=>{
         if(currentSong)
             togglePlay(currentSong);
     }
-    const retrieveSong = async (songId: string) => {
-        setLoading(true);
-        const song = await getMockSong(songId);
-        if (song) {
-            setCurrentSong(song);
-        }
-        setLoading(false);
-    }
 
-    useEffect(() => {
-        void retrieveSong(songQueue?.currentSong ?? "");
-    },[songQueue?.currentSong])
 
     return <Row style={{width: "100%",padding: 10,}}>
         <Row style={{
             backgroundColor: colors.playerColor,
             borderRadius: 10,
+            border: `1px solid ${colors.border}`,
             padding: "5px 10px",
             width: "100%",
         }} alignment={Alignment.spaceBetween} crossAlignment={Alignment.center}>
         <Row crossAlignment={Alignment.center} style={{width:"24%"}}>
-            <img src="https://picsum.photos/200/200" alt="album" style={{
+            <img src={song?.artwork ?? DEFAULT_ARTWORX} alt="album" style={{
                 ...styles.album,width: albumSize ?? 60, height: albumSize ?? 60
             }}/>
             <Column alignment={Alignment.center} style={{marginLeft:10}}>
@@ -153,12 +148,12 @@ export const LargePlayer = ({
                     color: colors.textPrimary,
                     fontWeight: "bold"
                 }}>{
-                    currentSong?.songName ?? "--"
+                    song?.songName ?? "--"
                 }</Typography><Typography style={{
-                    fontSize: 12,
+                    fontSize: 10,
                     color: colors.textSecondary,
                 }}>{
-                    currentSong?.songPerformer ?? "--"
+                    song?.songPerformer ?? "--"
                 }</Typography>
             </Column>
         </Row>

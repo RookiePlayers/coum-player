@@ -119,7 +119,7 @@ export const CoumDrawer = ({
         }
         </List>
         </Drawer>
-        <Main open={open} >
+        <Main open={open} style={{overflowY: 'auto', height: '100%'}} >
             {children}
         </Main>
         <Column style={{position: "absolute",width:"100%", bottom: 0, zIndex: 1200}}>

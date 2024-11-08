@@ -16,6 +16,7 @@ type User = {
 }
 type Song = {
     audioDuration: number;
+    artwork?: string;
     compositionSplitBreakdown: string;
     copyrightOwner: string;
     createdOn: string;
@@ -52,6 +53,18 @@ type Playlist = {
     songs: string[];
     id: string;
 }
+type Album = {
+    albumName: string;
+    albumType: string;
+    albumArt: string;
+    albumId: string;
+    explicity: boolean;
+    artist: string;
+    songs: string[];
+    year: string | number;
+    genre: string;
+    duration: number;
+}
 type PlayerQueue = {
     playedSongs: {[key: string]: string};
     currentSong: string;
@@ -59,4 +72,11 @@ type PlayerQueue = {
     currentSongIndex: number;
 }
 
-export type { Song, Playlist, PlayerQueue, User}
+
+type PaginationData = {
+    offset?: number;
+    limit: number;
+    cursor?: string;
+}
+
+export type { Song, Playlist, PlayerQueue, User, PaginationData, Album}

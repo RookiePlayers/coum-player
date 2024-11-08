@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Song } from "../types";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import { useSongMockService, useSongService } from "../services/useSongService";
+import { useSongService } from "../services/useSongService";
 import { IconButton, Skeleton, Typography } from "@mui/material";
 import { Slider } from "primereact/slider";
 import ReactHowler from 'react-howler';

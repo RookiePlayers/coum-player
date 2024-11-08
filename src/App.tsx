@@ -4,10 +4,10 @@ import { store } from './store/store';
 import { Alignment, Column } from 'ruki-react-layouts';
 import { CoumPlayer } from './CoumPlayer';
 import { PrimeReactProvider } from 'primereact/api';
-import { InitialMusicPlayerContextState, MusicPlayerContext } from './provider/music_player_provider';
+import { InitialMusicPlayerContextState, MusicPlayerContext, MusicPlayerProvider } from './provider/music_player_provider';
 import { AuthProvider } from './provider/auth_provider';
 import MediaQueryProvider from './provider/media_query';
-
+import RoutingProvider from './provider/routing';
 export const parseUrlForQueryParams = (url: string)=>{
   const urlSplit = url.split('/');
  const mainPath = urlSplit[urlSplit.length - 1];
@@ -32,9 +32,11 @@ function App() {
       <PrimeReactProvider>
         <AuthProvider>
           <MediaQueryProvider>
-          <MusicPlayerContext.Provider value={InitialMusicPlayerContextState}>
+          <MusicPlayerProvider initialState={InitialMusicPlayerContextState}>
+            <RoutingProvider>
             <CoumPlayer height={height} width={width}/>
-          </MusicPlayerContext.Provider>
+              </RoutingProvider>
+          </MusicPlayerProvider>
           </MediaQueryProvider>
         </AuthProvider>
         </PrimeReactProvider>
